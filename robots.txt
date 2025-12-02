@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://martasant.github.io/pirata/sitemap.xml
+Sitemap: https://martasant.github.io/Trattoriailpirata/sitemap.xml
 

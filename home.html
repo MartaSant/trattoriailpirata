@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" href="piratadef.png">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://martasant.github.io/pirata/home.html">
+    <link rel="canonical" href="https://martasant.github.io/Trattoriailpirata/home.html">
     
     <!-- Preconnect per CDN esterni (performance) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,19 +29,19 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://martasant.github.io/pirata/home.html">
+    <meta property="og:url" content="https://martasant.github.io/Trattoriailpirata/home.html">
     <meta property="og:title" content="Home · IL PIRATA">
     <meta property="og:description" content="IL PIRATA - Naviga nel sapore. Ristorante a tema marinaro e piratesco con specialità di pesce e cocktail esotici.">
-    <meta property="og:image" content="https://martasant.github.io/pirata/piratadef.png">
+    <meta property="og:image" content="https://martasant.github.io/Trattoriailpirata/piratadef.png">
     <meta property="og:locale" content="it_IT">
     <meta property="og:site_name" content="IL PIRATA · Naviga nel sapore">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://martasant.github.io/pirata/home.html">
+    <meta name="twitter:url" content="https://martasant.github.io/Trattoriailpirata/home.html">
     <meta name="twitter:title" content="Home · IL PIRATA">
     <meta name="twitter:description" content="IL PIRATA - Naviga nel sapore. Ristorante a tema marinaro e piratesco con specialità di pesce e cocktail esotici.">
-    <meta name="twitter:image" content="https://martasant.github.io/pirata/piratadef.png">
+    <meta name="twitter:image" content="https://martasant.github.io/Trattoriailpirata/piratadef.png">
     
     <!-- Meta tag per disabilitare la cache del browser -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -57,6 +57,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="home-body">
+    <div class="bg-slides">
+        <div class="bg-slide active" style="background-image: url('bg1.png');"></div>
+        <div class="bg-slide" style="background-image: url('bg2.png');"></div>
+        <div class="bg-slide" style="background-image: url('bg3.png');"></div>
+        <div class="bg-slide" style="background-image: url('bg4.png');"></div>
+    </div>
+    <div class="bg-overlay"></div>
     <header class="home-header">
         <img src="piratadef.png" alt="IL PIRATA" class="home-logo">
         <h1 class="home-title">IL PIRATA</h1>
@@ -110,12 +117,12 @@
                 <div class="card-arrow">→</div>
             </a>
             
-            <a href="network.html" class="card">
+            <a href="contatti.html" class="card">
                 <div class="card-icon">
-                    <i class="fas fa-network-wired"></i>
+                    <i class="fas fa-map-marker-alt"></i>
                 </div>
-                <h2 class="card-title">Il Network</h2>
-                <p class="card-subtitle">Altri locali del gruppo</p>
+                <h2 class="card-title">Raggiungerci</h2>
+                <p class="card-subtitle">Indirizzo, mappa e contatti</p>
                 <div class="card-arrow">→</div>
             </a>
         </div>
@@ -182,6 +189,46 @@
                 }, 60000);
             });
         }
+        
+        // Slideshow automatico per lo sfondo con transizione fluida
+        (function() {
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.bg-slide');
+            const totalSlides = slides.length;
+            let isTransitioning = false;
+            
+            // Precarica tutte le immagini
+            const images = ['bg1.png', 'bg2.png', 'bg3.png', 'bg4.png'];
+            images.forEach(img => {
+                const imgEl = new Image();
+                imgEl.src = img;
+            });
+            
+            function changeSlide() {
+                if (isTransitioning || totalSlides === 0) return;
+                isTransitioning = true;
+                
+                const prevSlide = currentSlide;
+                currentSlide = (currentSlide + 1) % totalSlides;
+                
+                // Rimuovi active dalla slide precedente
+                slides[prevSlide].classList.remove('active');
+                
+                // Usa requestAnimationFrame per garantire che la transizione avvenga
+                requestAnimationFrame(function() {
+                    // Aggiungi active alla nuova slide
+                    slides[currentSlide].classList.add('active');
+                    
+                    // Aspetta che la transizione finisca
+                    setTimeout(() => {
+                        isTransitioning = false;
+                    }, 2100);
+                });
+            }
+            
+            // Cambia slide ogni 5 secondi (4s + 1s di transizione)
+            setInterval(changeSlide, 5000);
+        })();
     </script>
 </body>
 </html>

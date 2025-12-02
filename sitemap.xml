@@ -1,61 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://martasant.github.io/pirata/</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/home.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/home.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/food.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/food.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/cocktails.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/cocktails.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/winebeer.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/winebeer.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/allergeni.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/allergeni.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/social.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/social.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/network.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/contatti.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/policy.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/policy.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     <url>
-        <loc>https://martasant.github.io/pirata/autore.html</loc>
+        <loc>https://martasant.github.io/Trattoriailpirata/autore.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>

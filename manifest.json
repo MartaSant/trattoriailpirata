@@ -4,7 +4,7 @@
   "description": "IL PIRATA - Naviga nel sapore. Ristorante a tema marinaro e piratesco con specialità di pesce e cocktail esotici.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0e1a",
+  "background_color": "#87CEEB",
   "theme_color": "#D4AF37",
   "orientation": "portrait",
   "scope": "/",

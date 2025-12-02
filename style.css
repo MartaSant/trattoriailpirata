@@ -15,7 +15,7 @@ html {
 
 body {
     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
+    background: #87CEEB;
     color: #1a3a5f;
     line-height: 1.6;
     overflow-x: hidden;
@@ -117,30 +117,57 @@ a:hover {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
     position: relative;
     overflow-x: hidden;
 }
 
-.home-body::before {
-    content: '';
+.bg-slides {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-        radial-gradient(circle at 20% 50%, rgba(135, 206, 235, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(70, 130, 180, 0.2) 0%, transparent 50%);
-    pointer-events: none;
     z-index: 0;
+    pointer-events: none;
+}
+
+.bg-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    will-change: opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.bg-slide.active {
+    opacity: 1;
+}
+
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(135, 206, 235, 0.3);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .home-header {
     text-align: center;
-    padding: 3rem 1.5rem 2rem;
+    padding: 3rem 0 2rem;
     position: relative;
     z-index: 1;
+    width: 100%;
 }
 
 .home-logo {
@@ -254,10 +281,11 @@ a:hover {
 
 .menu-body {
     min-height: 100vh;
-    background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
     display: flex;
     flex-direction: column;
+    position: relative;
 }
+
 
 .menu-page {
     flex: 1;
@@ -266,14 +294,16 @@ a:hover {
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
-    padding: 0 1.5rem;
+    padding: 0;
+    position: relative;
+    z-index: 10;
 }
 
 .menu-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 0;
+    padding: 1.5rem 1.5rem;
     border-bottom: 2px solid rgba(26, 58, 95, 0.5);
     margin-bottom: 2rem;
     position: sticky;
@@ -281,6 +311,8 @@ a:hover {
     background: rgba(135, 206, 235, 0.95);
     backdrop-filter: blur(10px);
     z-index: 100;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .menu-header-left {
@@ -347,7 +379,9 @@ a:hover {
 
 .menu-content {
     flex: 1;
-    padding-bottom: 2rem;
+    padding: 0 1.5rem 2rem;
+    position: relative;
+    z-index: 10;
 }
 
 .menu-section {
@@ -462,7 +496,7 @@ a:hover {
 .shell-body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%);
+    background: #87CEEB;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -505,7 +539,7 @@ a:hover {
         flex-direction: row;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.4rem 0;
+        padding: 0.4rem 1rem;
         margin-bottom: 0.5rem;
     }
     
@@ -546,7 +580,7 @@ a:hover {
 
 @media (max-width: 480px) {
     .home-header {
-        padding: 2rem 1rem 1.5rem;
+        padding: 2rem 0 1.5rem;
     }
     
     .home-logo {
@@ -570,11 +604,19 @@ a:hover {
     }
     
     .menu-page {
-        padding: 0 1rem;
+        padding: 0;
     }
     
     .menu-header {
-        padding: 0.5rem 0;
+        padding: 0.4rem 1rem;
+    }
+    
+    .menu-content {
+        padding: 0 1rem 2rem;
+    }
+    
+    .menu-header {
+        padding: 0.5rem 1rem;
         margin-bottom: 0.75rem;
         gap: 0.5rem;
     }
@@ -612,7 +654,7 @@ a:hover {
     }
     
     .menu-header {
-        padding: 0.4rem 0;
+        padding: 0.4rem 1rem;
         margin-bottom: 0.5rem;
         gap: 0.4rem;
     }
@@ -648,4 +690,29 @@ a:hover {
 .mt-2 { margin-top: 2rem; }
 .mb-1 { margin-bottom: 1rem; }
 .mb-2 { margin-bottom: 2rem; }
+
+/* ============================================================================
+   MAPPA
+   ============================================================================ */
+
+.map-container {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+@media (max-width: 480px) {
+    .map-container {
+        height: 250px;
+    }
+}
 
