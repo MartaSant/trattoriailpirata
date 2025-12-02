@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Autore · IL PIRATA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Informazioni su Studio IDE - IL PIRATA.">
+    
+    <!-- Meta tag iOS (PWA/Home Screen) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IL PIRATA">
+    <link rel="apple-touch-icon" href="piratadef.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D4AF37">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="piratadef.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://martasant.github.io/pirata/autore.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://martasant.github.io/pirata/autore.html">
+    <meta property="og:title" content="Autore · IL PIRATA">
+    <meta property="og:description" content="Informazioni su Studio IDE - IL PIRATA.">
+    <meta property="og:image" content="https://martasant.github.io/pirata/piratadef.png">
+    <meta property="og:locale" content="it_IT">
+    <meta property="og:site_name" content="IL PIRATA · Naviga nel sapore">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://martasant.github.io/pirata/autore.html">
+    <meta name="twitter:title" content="Autore · IL PIRATA">
+    <meta name="twitter:description" content="Informazioni su Studio IDE - IL PIRATA.">
+    <meta name="twitter:image" content="https://martasant.github.io/pirata/piratadef.png">
+    
+    <!-- Meta tag per disabilitare la cache del browser -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="menu-body">
+    <div class="menu-page">
+        <header class="menu-header">
+            <div class="menu-header-left">
+                <div class="menu-logo">
+                    <img src="piratadef.png" alt="IL PIRATA">
+                </div>
+                <div class="menu-title-block">
+                    <span class="menu-eyebrow">IL PIRATA · Naviga nel sapore</span>
+                    <h1 class="menu-title">Autore</h1>
+                </div>
+            </div>
+            <a href="home.html" class="menu-close">
+                <span>&larr;</span>
+                <span>Home</span>
+            </a>
+        </header>
+        
+        <main class="menu-content">
+            <section class="menu-section">
+                <h2 class="menu-section-title">Studio IDE</h2>
+                
+                <div class="menu-item">
+                    <p class="item-description">
+                        Questo sito web è stato progettato e sviluppato da <strong>Studio IDE</strong>, 
+                        uno studio specializzato nella creazione di esperienze digitali innovative per 
+                        il settore della ristorazione.
+                    </p>
+                </div>
+                
+                <div class="menu-item">
+                    <h3 class="item-name">Servizi</h3>
+                    <p class="item-description">
+                        Studio IDE offre servizi completi di design e sviluppo web, 
+                        inclusi siti web responsive, Progressive Web Apps (PWA), 
+                        e soluzioni digitali personalizzate.
+                    </p>
+                </div>
+                
+                <div class="menu-item">
+                    <h3 class="item-name">Contatti</h3>
+                    <p class="item-description">
+                        Per informazioni su progetti e collaborazioni, 
+                        contattare Studio IDE attraverso i canali ufficiali.
+                    </p>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="site-footer">
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> IL PIRATA. Tutti i diritti riservati.</p>
+                <p class="footer-designed">
+                    Designed by <a href="autore.html" class="footer-author-link">Studio IDE</a>
+                </p>
+                <p class="footer-designed" style="margin-top: 0.3rem;">
+                    <a href="policy.html" class="footer-author-link">Policy</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
+                    .then(function(registration) {
+                        console.log('Service Worker registrato con successo:', registration.scope);
+                        registration.update();
+                        navigator.serviceWorker.addEventListener('message', function(event) {
+                            if (event.data && event.data.type === 'SW_UPDATED') {
+                                console.log('Nuovo Service Worker disponibile, ricarico la pagina...');
+                                window.location.reload();
+                            }
+                        });
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', function() {
+                                    if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                                        console.log('Nuovo Service Worker attivato, ricarico la pagina...');
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('Registrazione Service Worker fallita:', error);
+                    });
+                setInterval(function() {
+                    navigator.serviceWorker.getRegistration().then(function(registration) {
+                        if (registration) {
+                            registration.update();
+                        }
+                    });
+                }, 60000);
+            });
+        }
+    </script>
+</body>
+</html>
+

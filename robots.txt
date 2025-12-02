@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://martasant.github.io/pirata/sitemap.xml
+
