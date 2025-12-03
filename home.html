@@ -169,8 +169,8 @@
             updateSWStatus('', 'Registrazione Service Worker...');
             
             // Registra immediatamente, non aspettare il load
-            navigator.serviceWorker.register('/service-worker.js', { 
-                scope: '/',
+            navigator.serviceWorker.register('/Trattoriailpirata/service-worker.js', { 
+                scope: '/Trattoriailpirata/',
                 updateViaCache: 'none' 
             })
             .then(function(registration) {
