@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" href="piratadef.png">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://martasant.github.io/Trattoriailpirata/home.html">
+    <link rel="canonical" href="https://martasant.github.io/trattoriailpirata/home.html">
     
     <!-- Preconnect per CDN esterni (performance) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,10 +68,6 @@
         <img src="piratadef.png" alt="IL PIRATA" class="home-logo">
         <h1 class="home-title">IL PIRATA</h1>
         <p class="home-tagline">Naviga nel sapore</p>
-        <button id="install-button" class="install-button" style="display: none;">
-            <i class="fas fa-download"></i>
-            <span>Installa App</span>
-        </button>
     </header>
     
     <main class="home-main">
@@ -148,246 +144,49 @@
         // Aggiorna anno nel footer
         document.getElementById('year').textContent = new Date().getFullYear();
         
-        // Registrazione Service Worker (deve essere registrato PRIMA di beforeinstallprompt)
+        // Registrazione Service Worker
         if ('serviceWorker' in navigator) {
-            // Registra immediatamente, non aspettare il load
-            navigator.serviceWorker.register('/service-worker.js', { 
-                scope: '/',
-                updateViaCache: 'none' 
-            })
-            .then(function(registration) {
-                console.log('✅ Service Worker registrato con successo:', registration.scope);
-                
-                // Verifica che sia attivo
-                if (registration.active) {
-                    console.log('✅ Service Worker attivo');
-                } else if (registration.installing) {
-                    console.log('⏳ Service Worker in installazione...');
-                } else if (registration.waiting) {
-                    console.log('⏳ Service Worker in attesa...');
-                }
-                
-                // Controlla aggiornamenti ogni volta che la pagina viene caricata
-                registration.update();
-                
-                // Ascolta messaggi dal service worker
-                navigator.serviceWorker.addEventListener('message', function(event) {
-                    if (event.data && event.data.type === 'SW_UPDATED') {
-                        console.log('Nuovo Service Worker disponibile, ricarico la pagina...');
-                        window.location.reload();
-                    }
-                });
-                
-                // Controlla se c'è un nuovo service worker in attesa
-                registration.addEventListener('updatefound', function() {
-                    const newWorker = registration.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', function() {
-                            if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
-                                console.log('Nuovo Service Worker attivato, ricarico la pagina...');
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
+                    .then(function(registration) {
+                        console.log('Service Worker registrato con successo:', registration.scope);
+                        
+                        // Controlla aggiornamenti ogni volta che la pagina viene caricata
+                        registration.update();
+                        
+                        // Ascolta messaggi dal service worker
+                        navigator.serviceWorker.addEventListener('message', function(event) {
+                            if (event.data && event.data.type === 'SW_UPDATED') {
+                                console.log('Nuovo Service Worker disponibile, ricarico la pagina...');
                                 window.location.reload();
                             }
                         });
-                    }
-                });
-            })
-            .catch(function(error) {
-                console.error('❌ Registrazione Service Worker fallita:', error);
-            });
-        } else {
-            console.error('❌ Service Worker non supportato');
-        }
-        
-        // Funzione installazione PWA (supporto Chrome, Edge, Firefox)
-        let deferredPrompt;
-        const installButton = document.getElementById('install-button');
-        
-        // Rileva il browser
-        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-        const isEdge = /Edg/.test(navigator.userAgent);
-        
-        // Verifica se l'app è già installata
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                            window.navigator.standalone === true;
-        
-        if (isStandalone) {
-            // App già installata, nascondi il pulsante
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-        }
-        
-        // Funzione per verificare i requisiti PWA
-        function checkPWARequirements() {
-            const checks = {
-                https: window.location.protocol === 'https:' || window.location.hostname === 'localhost',
-                manifest: false,
-                serviceWorker: false
-            };
-            
-            // Verifica manifest
-            return fetch('manifest.json')
-                .then(response => {
-                    checks.manifest = response.ok;
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    return null;
-                })
-                .then(manifest => {
-                    if (manifest) {
-                        console.log('✅ Manifest valido:', manifest);
-                        console.log('  - name:', manifest.name);
-                        console.log('  - icons:', manifest.icons ? manifest.icons.length : 0);
-                    }
-                    
-                    // Verifica service worker
-                    if ('serviceWorker' in navigator) {
-                        return navigator.serviceWorker.getRegistration()
-                            .then(registration => {
-                                checks.serviceWorker = !!registration && !!registration.active;
-                                console.log('✅ Service Worker:', checks.serviceWorker ? 'attivo' : 'non attivo');
-                                return checks;
-                            });
-                    }
-                    return checks;
-                })
-                .catch(error => {
-                    console.error('❌ Errore verifica requisiti:', error);
-                    return checks;
-                });
-        }
-        
-        // Verifica requisiti dopo un breve delay per permettere al service worker di registrarsi
-        setTimeout(() => {
-            checkPWARequirements().then(checks => {
-                console.log('📋 Requisiti PWA:', checks);
-                if (!checks.https) {
-                    console.warn('⚠️ HTTPS richiesto per PWA');
-                }
-            });
-        }, 1000);
-        
-        // Mostra il pulsante quando l'app è installabile (Chrome/Edge)
-        window.addEventListener('beforeinstallprompt', function(e) {
-            console.log('✅ Evento beforeinstallprompt ricevuto!');
-            // Previene il banner automatico
-            e.preventDefault();
-            // Salva l'evento per usarlo dopo
-            deferredPrompt = e;
-            
-            // Mostra il pulsante di installazione
-            if (installButton) {
-                installButton.style.display = 'inline-flex';
-                console.log('✅ Pulsante installazione mostrato');
-            }
-        });
-        
-        // Per Firefox e Chrome (fallback): mostra il pulsante se i requisiti PWA sono soddisfatti
-        // Questo è utile se beforeinstallprompt non viene emesso (es. Chrome su mobile o dopo 30 secondi)
-        if (installButton && !isStandalone) {
-            setTimeout(() => {
-                // Verifica che il manifest sia accessibile
-                fetch('manifest.json')
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                        throw new Error('Manifest non accessibile');
-                    })
-                    .then(manifest => {
-                        if (manifest && manifest.name && manifest.icons && manifest.icons.length >= 1) {
-                            // Verifica che il service worker sia registrato
-                            if ('serviceWorker' in navigator) {
-                                return navigator.serviceWorker.getRegistration()
-                                    .then(registration => {
-                                        const hasSW = registration && registration.active;
-                                        const isHTTPS = window.location.protocol === 'https:' || 
-                                                       window.location.hostname === 'localhost';
-                                        
-                                        // Mostra il pulsante se tutti i requisiti sono soddisfatti
-                                        // ma beforeinstallprompt non è ancora arrivato
-                                        if (hasSW && isHTTPS && !deferredPrompt && installButton) {
-                                            installButton.style.display = 'inline-flex';
-                                            console.log('✅ Pulsante installazione mostrato (fallback)');
-                                        }
-                                    });
+                        
+                        // Controlla se c'è un nuovo service worker in attesa
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', function() {
+                                    if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                                        console.log('Nuovo Service Worker attivato, ricarico la pagina...');
+                                        window.location.reload();
+                                    }
+                                });
                             }
-                        }
+                        });
                     })
-                    .catch(error => {
-                        console.warn('⚠️ Verifica requisiti PWA fallita:', error);
+                    .catch(function(error) {
+                        console.log('Registrazione Service Worker fallita:', error);
                     });
-            }, 2000); // Aspetta 2 secondi per permettere al service worker di registrarsi
-        }
-        
-        // Nascondi il pulsante se l'app è già installata
-        window.addEventListener('appinstalled', function(e) {
-            console.log('✅ PWA installata con successo!');
-            deferredPrompt = null;
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-        });
-        
-        // Gestisci il click sul pulsante
-        if (installButton) {
-            installButton.addEventListener('click', async function() {
-                // Firefox: mostra istruzioni
-                if (isFirefox && !deferredPrompt) {
-                    alert('Per installare l\'app su Firefox:\n\n' +
-                          '1. Clicca sull\'icona "+" o "Install" nella barra degli indirizzi\n' +
-                          '2. Oppure vai al menu (☰) → "Installa" o "Installa come app"\n\n' +
-                          'L\'app verrà aggiunta al desktop e potrai aprirla come un\'applicazione.');
-                    return;
-                }
                 
-                if (!deferredPrompt) {
-                    // L'installazione non è disponibile - mostra istruzioni specifiche
-                    let message = 'Per installare l\'app:\n\n';
-                    
-                    if (isChrome || isEdge) {
-                        message += 'Su Chrome/Edge:\n';
-                        message += '1. Cerca l\'icona "Installa" (➕) nella barra degli indirizzi\n';
-                        message += '2. Oppure vai al menu (⋮) → "Installa IL PIRATA"\n';
-                        message += '3. Su mobile: Menu → "Aggiungi alla schermata iniziale"\n\n';
-                        message += 'Nota: Chrome potrebbe richiedere di visitare il sito per almeno 30 secondi prima di mostrare l\'opzione di installazione.';
-                    } else if (isFirefox) {
-                        message += 'Su Firefox:\n';
-                        message += '1. Clicca sull\'icona "+" o "Install" nella barra degli indirizzi\n';
-                        message += '2. Oppure vai al menu (☰) → "Installa" o "Installa come app"';
-                    } else {
-                        message += 'Cerca l\'icona di installazione nella barra degli indirizzi del tuo browser.';
-                    }
-                    
-                    alert(message);
-                    return;
-                }
-                
-                try {
-                    // Mostra il prompt di installazione (Chrome/Edge)
-                    deferredPrompt.prompt();
-                    
-                    // Attendi la risposta dell'utente
-                    const { outcome } = await deferredPrompt.userChoice;
-                    
-                    if (outcome === 'accepted') {
-                        console.log('✅ Utente ha accettato l\'installazione');
-                    } else {
-                        console.log('❌ Utente ha rifiutato l\'installazione');
-                    }
-                    
-                    // Pulisci l'evento
-                    deferredPrompt = null;
-                    
-                    // Nascondi il pulsante
-                    if (installButton) {
-                        installButton.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Errore durante l\'installazione:', error);
-                }
+                // Controlla aggiornamenti ogni 60 secondi
+                setInterval(function() {
+                    navigator.serviceWorker.getRegistration().then(function(registration) {
+                        if (registration) {
+                            registration.update();
+                        }
+                    });
+                }, 60000);
             });
         }
         

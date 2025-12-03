@@ -2,25 +2,29 @@
 // Versione cache: pirata-v1
 
 const CACHE_NAME = 'pirata-v1';
+
+// Determina il percorso base dal scope del service worker
+const BASE_PATH = self.location.pathname.replace('/service-worker.js', '');
+
 const PRECACHE_FILES = [
-    '/',
-    '/home.html',
-    '/index.html',
-    '/style.css',
-    '/piratadef.png',
-    '/bg1.png',
-    '/bg2.png',
-    '/bg3.png',
-    '/bg4.png',
-    '/manifest.json',
-    '/food.html',
-    '/cocktails.html',
-    '/winebeer.html',
-    '/allergeni.html',
-    '/social.html',
-    '/contatti.html',
-    '/policy.html',
-    '/autore.html',
+    BASE_PATH + '/',
+    BASE_PATH + '/home.html',
+    BASE_PATH + '/index.html',
+    BASE_PATH + '/style.css',
+    BASE_PATH + '/piratadef.png',
+    BASE_PATH + '/bg1.png',
+    BASE_PATH + '/bg2.png',
+    BASE_PATH + '/bg3.png',
+    BASE_PATH + '/bg4.png',
+    BASE_PATH + '/manifest.json',
+    BASE_PATH + '/food.html',
+    BASE_PATH + '/cocktails.html',
+    BASE_PATH + '/winebeer.html',
+    BASE_PATH + '/allergeni.html',
+    BASE_PATH + '/social.html',
+    BASE_PATH + '/contatti.html',
+    BASE_PATH + '/policy.html',
+    BASE_PATH + '/autore.html',
     'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
 ];
@@ -63,18 +67,34 @@ self.addEventListener('activate', function(event) {
 
 // Fetch Event - Strategia Network First
 self.addEventListener('fetch', function(event) {
+    // Ignora richieste non GET
+    if (event.request.method !== 'GET') {
+        return;
+    }
+    
     const url = new URL(event.request.url);
     
+    // Ignora richieste a domini esterni (tranne CDN necessari)
+    if (url.origin !== location.origin && 
+        !url.href.includes('fonts.googleapis.com') &&
+        !url.href.includes('fonts.gstatic.com') &&
+        !url.href.includes('cdnjs.cloudflare.com')) {
+        return;
+    }
+    
     // Strategia Network First per HTML
-    if (event.request.headers.get('accept').includes('text/html')) {
+    const acceptHeader = event.request.headers.get('accept');
+    if (acceptHeader && acceptHeader.includes('text/html')) {
         event.respondWith(
             fetch(event.request, { cache: 'no-store' })
                 .then(function(response) {
                     // Clona la risposta per poterla usare e cachare
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME).then(function(cache) {
-                        cache.put(event.request, responseToCache);
-                    });
+                    if (response.status === 200) {
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME).then(function(cache) {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
                     return response;
                 })
                 .catch(function() {

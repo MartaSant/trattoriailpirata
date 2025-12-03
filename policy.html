@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" href="piratadef.png">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://martasant.github.io/Trattoriailpirata/policy.html">
+    <link rel="canonical" href="https://martasant.github.io/trattoriailpirata/policy.html">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -141,7 +141,7 @@
         
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
+                navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
                     .then(function(registration) {
                         console.log('Service Worker registrato con successo:', registration.scope);
                         registration.update();
