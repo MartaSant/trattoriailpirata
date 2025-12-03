@@ -3,26 +3,29 @@
 
 const CACHE_NAME = 'pirata-v1';
 
+// Determina il percorso base dal scope del service worker
+const BASE_PATH = '/Trattoriailpirata';
+
 // File da mettere in cache all'installazione
 const PRECACHE_FILES = [
-    '/Trattoriailpirata/',
-    '/Trattoriailpirata/home.html',
-    '/Trattoriailpirata/index.html',
-    '/Trattoriailpirata/style.css',
-    '/Trattoriailpirata/piratadef.png',
-    '/Trattoriailpirata/bg1.png',
-    '/Trattoriailpirata/bg2.png',
-    '/Trattoriailpirata/bg3.png',
-    '/Trattoriailpirata/bg4.png',
-    '/Trattoriailpirata/manifest.json',
-    '/Trattoriailpirata/food.html',
-    '/Trattoriailpirata/cocktails.html',
-    '/Trattoriailpirata/winebeer.html',
-    '/Trattoriailpirata/allergeni.html',
-    '/Trattoriailpirata/social.html',
-    '/Trattoriailpirata/contatti.html',
-    '/Trattoriailpirata/policy.html',
-    '/Trattoriailpirata/autore.html',
+    BASE_PATH + '/',
+    BASE_PATH + '/home.html',
+    BASE_PATH + '/index.html',
+    BASE_PATH + '/style.css',
+    BASE_PATH + '/piratadef.png',
+    BASE_PATH + '/bg1.png',
+    BASE_PATH + '/bg2.png',
+    BASE_PATH + '/bg3.png',
+    BASE_PATH + '/bg4.png',
+    BASE_PATH + '/manifest.json',
+    BASE_PATH + '/food.html',
+    BASE_PATH + '/cocktails.html',
+    BASE_PATH + '/winebeer.html',
+    BASE_PATH + '/allergeni.html',
+    BASE_PATH + '/social.html',
+    BASE_PATH + '/contatti.html',
+    BASE_PATH + '/policy.html',
+    BASE_PATH + '/autore.html',
     'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
 ];
