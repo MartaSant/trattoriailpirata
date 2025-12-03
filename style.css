@@ -162,6 +162,38 @@ a:hover {
     z-index: 1;
 }
 
+.install-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: #0f2438;
+    border: 2px solid rgba(15, 36, 56, 0.3);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+.install-button:hover {
+    background: #FFD700;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
+}
+
+.install-button:active {
+    transform: translateY(0);
+}
+
+.install-button i {
+    font-size: 1rem;
+}
+
 .home-header {
     text-align: center;
     padding: 3rem 0 2rem;
