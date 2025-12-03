@@ -6,28 +6,14 @@ const CACHE_NAME = 'pirata-v1';
 // Determina il percorso base dal scope del service worker
 const BASE_PATH = '/Trattoriailpirata';
 
-// File da mettere in cache all'installazione
+// File essenziali da mettere in cache all'installazione
+// Solo file critici per evitare errori durante l'installazione
 const PRECACHE_FILES = [
     BASE_PATH + '/',
     BASE_PATH + '/home.html',
-    BASE_PATH + '/index.html',
     BASE_PATH + '/style.css',
-    BASE_PATH + '/piratadef.png',
-    BASE_PATH + '/bg1.png',
-    BASE_PATH + '/bg2.png',
-    BASE_PATH + '/bg3.png',
-    BASE_PATH + '/bg4.png',
     BASE_PATH + '/manifest.json',
-    BASE_PATH + '/food.html',
-    BASE_PATH + '/cocktails.html',
-    BASE_PATH + '/winebeer.html',
-    BASE_PATH + '/allergeni.html',
-    BASE_PATH + '/social.html',
-    BASE_PATH + '/contatti.html',
-    BASE_PATH + '/policy.html',
-    BASE_PATH + '/autore.html',
-    'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
+    BASE_PATH + '/piratadef.png'
 ];
 
 // Install Event - Precaching
@@ -36,12 +22,31 @@ self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME).then(function(cache) {
             console.log('[Service Worker] Precaching file...');
-            return cache.addAll(PRECACHE_FILES.map(url => new Request(url, { cache: 'reload' })));
-        }).then(function() {
-            console.log('[Service Worker] Precaching completato');
-            return self.skipWaiting();
+            // Precaching con gestione errori individuale per ogni file
+            return Promise.allSettled(
+                PRECACHE_FILES.map(function(url) {
+                    return fetch(new Request(url, { cache: 'reload' }))
+                        .then(function(response) {
+                            if (response.ok) {
+                                return cache.put(url, response);
+                            } else {
+                                console.warn('[Service Worker] File non trovato:', url);
+                                return Promise.resolve();
+                            }
+                        })
+                        .catch(function(error) {
+                            console.warn('[Service Worker] Errore precaching file:', url, error);
+                            return Promise.resolve(); // Continua anche se un file fallisce
+                        });
+                })
+            ).then(function() {
+                console.log('[Service Worker] Precaching completato');
+                return self.skipWaiting();
+            });
         }).catch(function(error) {
             console.error('[Service Worker] Errore durante il precaching:', error);
+            // Anche se il precaching fallisce, attiva comunque il service worker
+            return self.skipWaiting();
         })
     );
 });
