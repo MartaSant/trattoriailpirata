@@ -68,6 +68,10 @@
         <img src="piratadef.png" alt="IL PIRATA" class="home-logo">
         <h1 class="home-title">IL PIRATA</h1>
         <p class="home-tagline">Naviga nel sapore</p>
+        <button id="install-button" class="install-button" style="display: none;">
+            <i class="fas fa-download"></i>
+            <span>Installa App</span>
+        </button>
     </header>
     
     <main class="home-main">
@@ -144,8 +148,11 @@
         // Aggiorna anno nel footer
         document.getElementById('year').textContent = new Date().getFullYear();
         
-        // Handler per installazione PWA (Chrome/Edge)
+        // Handler per installazione PWA (Chrome/Edge/Firefox Desktop)
         let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        
+        // Mostra il pulsante quando l'app è installabile
         window.addEventListener('beforeinstallprompt', function(e) {
             // Previene il banner automatico
             e.preventDefault();
@@ -153,9 +160,53 @@
             deferredPrompt = e;
             console.log('PWA installabile - evento beforeinstallprompt catturato');
             
-            // Opzionale: mostra un pulsante personalizzato per installare
-            // Puoi aggiungere qui un pulsante nell'UI se vuoi
+            // Mostra il pulsante di installazione
+            if (installButton) {
+                installButton.style.display = 'inline-flex';
+            }
         });
+        
+        // Nascondi il pulsante se l'app è già installata
+        window.addEventListener('appinstalled', function(e) {
+            console.log('PWA installata con successo!');
+            deferredPrompt = null;
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+        });
+        
+        // Gestisci il click sul pulsante di installazione
+        if (installButton) {
+            installButton.addEventListener('click', async function() {
+                if (!deferredPrompt) {
+                    return;
+                }
+                
+                // Mostra il prompt di installazione
+                deferredPrompt.prompt();
+                
+                // Attendi la risposta dell'utente
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('Risposta installazione:', outcome);
+                
+                // Pulisci l'evento
+                deferredPrompt = null;
+                
+                // Nascondi il pulsante
+                if (installButton) {
+                    installButton.style.display = 'none';
+                }
+            });
+        }
+        
+        // Verifica se l'app è già installata (standalone mode)
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            console.log('App già installata');
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+        }
         
         // Registrazione Service Worker
         if ('serviceWorker' in navigator) {

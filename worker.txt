@@ -1,0 +1,437 @@
+================================================================================
+                    DOCUMENTAZIONE PWA - DOWNLOAD/INSTALLAZIONE APP
+                    Logica e Implementazione per Service Worker e Manifest
+================================================================================
+
+INDICE
+------
+1. OVERVIEW PWA
+2. MANIFEST.JSON - Configurazione App
+3. SERVICE WORKER - Logica Cache e Offline
+4. REGISTRAZIONE SERVICE WORKER
+5. PROCESSO DI INSTALLAZIONE
+6. BEST PRACTICES
+7. TROUBLESHOOTING
+
+================================================================================
+1. OVERVIEW PWA
+================================================================================
+
+Una Progressive Web App (PWA) permette di installare un sito web come app nativa
+su dispositivi mobili e desktop. Per funzionare, una PWA richiede:
+
+1. Manifest.json - Definisce come l'app appare e si comporta
+2. Service Worker - Gestisce cache, offline e aggiornamenti
+3. HTTPS - Obbligatorio per PWA (GitHub Pages lo fornisce automaticamente)
+4. Icone - Almeno 192x192 e 512x512 pixel
+
+================================================================================
+2. MANIFEST.JSON - Configurazione App
+================================================================================
+
+Il manifest.json definisce i metadati dell'app installabile.
+
+STRUTTURA BASE:
+{
+  "name": "Nome App Completo",
+  "short_name": "Nome Breve",
+  "description": "Descrizione dell'app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F1E6",
+  "theme_color": "#7B2E2E",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logomini.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
+
+SPIEGAZIONE CAMPI:
+------------------
+- name: Nome completo mostrato durante l'installazione
+- short_name: Nome breve mostrato nella home screen
+- description: Descrizione dell'app
+- start_url: URL di partenza quando si apre l'app (può essere "/" o "/home.html")
+- display: 
+  * "standalone" - App senza barra del browser
+  * "fullscreen" - App a schermo intero
+  * "minimal-ui" - App con controlli minimi
+- background_color: Colore di sfondo durante il caricamento
+- theme_color: Colore della barra di stato (mobile)
+- orientation: "portrait" o "landscape" o "any"
+- scope: Ambito di navigazione dell'app (di solito "/" per tutto il sito)
+- icons: Array di icone (minimo 192x192 e 512x512)
+
+LINK NEL HTML:
+--------------
+Nel <head> di ogni pagina HTML aggiungere:
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7B2E2E">
+
+================================================================================
+3. SERVICE WORKER - Logica Cache e Offline
+================================================================================
+
+Il Service Worker gestisce:
+- Cache dei file per funzionamento offline
+- Aggiornamenti automatici
+- Strategie di caching
+
+STRUTTURA BASE SERVICE WORKER (service-worker.js):
+---------------------------------------------------
+
+// Versione cache - INCREMENTARE ad ogni aggiornamento significativo
+const CACHE_NAME = 'app-v1';
+
+// File da precachare all'installazione
+const PRECACHE_FILES = [
+    '/',
+    '/home.html',
+    '/index.html',
+    '/style.css',
+    '/manifest.json',
+    '/servizi.html',
+    '/prodotti.html',
+    '/contatti.html',
+    '/logo.png',
+    '/logomini.png',
+    '/logo.ico'
+];
+
+// INSTALL EVENT - Precaching
+self.addEventListener('install', function(event) {
+    console.log('[Service Worker] Install event');
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(function(cache) {
+                console.log('[Service Worker] Precaching files');
+                return cache.addAll(PRECACHE_FILES);
+            })
+            .then(function() {
+                return self.skipWaiting(); // Attiva immediatamente
+            })
+    );
+});
+
+// ACTIVATE EVENT - Pulizia cache vecchie
+self.addEventListener('activate', function(event) {
+    console.log('[Service Worker] Activate event');
+    event.waitUntil(
+        caches.keys().then(function(cacheNames) {
+            return Promise.all(
+                cacheNames.map(function(cacheName) {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('[Service Worker] Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(function() {
+            return self.clients.claim(); // Controlla tutte le pagine
+        })
+    );
+});
+
+// FETCH EVENT - Strategia Network First
+self.addEventListener('fetch', function(event) {
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') {
+        return;
+    }
+    
+    // Skip chrome-extension e altri non-http requests
+    if (!event.request.url.startsWith('http')) {
+        return;
+    }
+    
+    event.respondWith(
+        fetch(event.request)
+            .then(function(response) {
+                // HTML: non cachare, sempre controllare rete
+                if (event.request.headers.get('accept').includes('text/html')) {
+                    return response;
+                }
+                
+                // Altri asset: cache normale
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME)
+                    .then(function(cache) {
+                        cache.put(event.request, responseToCache);
+                    });
+                
+                return response;
+            })
+            .catch(function(error) {
+                console.log('[Service Worker] Fetch failed, trying cache:', error);
+                return caches.match(event.request)
+                    .then(function(response) {
+                        if (response) {
+                            return response;
+                        }
+                        // Pagina offline per navigazione
+                        if (event.request.mode === 'navigate') {
+                            return caches.match('/home.html');
+                        }
+                    });
+            })
+    );
+});
+
+STRATEGIA CACHE:
+---------------
+- Network First: Prova prima la rete, poi la cache
+- HTML: Sempre dalla rete (no cache) per avere sempre contenuti aggiornati
+- Asset (CSS, JS, immagini): Cache normale per performance
+
+AGGIORNAMENTO CACHE:
+--------------------
+1. Incrementare CACHE_NAME (es. 'app-v1' → 'app-v2')
+2. Aggiungere nuovi file a PRECACHE_FILES se necessario
+3. Il nuovo service worker si installerà automaticamente
+4. Le pagine si ricaricheranno quando rilevano l'aggiornamento
+
+================================================================================
+4. REGISTRAZIONE SERVICE WORKER
+================================================================================
+
+Il Service Worker deve essere registrato in OGNI pagina HTML.
+
+CODICE DA INSERIRE NEL <script> DI OGNI PAGINA:
+------------------------------------------------
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js', { 
+            updateViaCache: 'none' 
+        })
+            .then(function(registration) {
+                console.log('Service Worker registrato:', registration.scope);
+                
+                // Controlla aggiornamenti ad ogni caricamento
+                registration.update();
+                
+                // Ascolta messaggi dal service worker
+                navigator.serviceWorker.addEventListener('message', function(event) {
+                    if (event.data && event.data.type === 'SW_UPDATED') {
+                        console.log('Nuovo Service Worker disponibile, ricarico...');
+                        window.location.reload();
+                    }
+                });
+                
+                // Controlla se c'è un nuovo service worker in attesa
+                registration.addEventListener('updatefound', function() {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', function() {
+                            if (newWorker.state === 'activated' && 
+                                navigator.serviceWorker.controller) {
+                                console.log('Nuovo Service Worker attivato, ricarico...');
+                                window.location.reload();
+                            }
+                        });
+                    }
+                });
+            })
+            .catch(function(error) {
+                console.log('Registrazione Service Worker fallita:', error);
+            });
+        
+        // Controlla aggiornamenti ogni 60 secondi
+        setInterval(function() {
+            navigator.serviceWorker.getRegistration().then(function(registration) {
+                if (registration) {
+                    registration.update();
+                }
+            });
+        }, 60000);
+    });
+}
+
+SPIEGAZIONE:
+-----------
+- register('/service-worker.js'): Registra il service worker
+- updateViaCache: 'none' - Non usare cache per il service worker stesso
+- registration.update(): Controlla aggiornamenti
+- updatefound: Evento quando trova un nuovo service worker
+- statechange: Quando il nuovo worker si attiva, ricarica la pagina
+- setInterval: Controlla aggiornamenti ogni 60 secondi
+
+================================================================================
+5. PROCESSO DI INSTALLAZIONE
+================================================================================
+
+COME FUNZIONA L'INSTALLAZIONE:
+------------------------------
+
+1. UTENTE VISITA IL SITO
+   - Il browser legge il manifest.json
+   - Verifica i requisiti PWA (HTTPS, manifest, service worker)
+
+2. BANNER DI INSTALLAZIONE
+   - Chrome/Edge: Mostra banner "Installa app"
+   - Safari iOS: Menu Condividi → "Aggiungi alla schermata Home"
+   - Firefox: Menu → "Installa"
+
+3. CLICK SU INSTALLA
+   - Il browser installa l'app
+   - Crea icona nella home screen
+   - Apre l'app in modalità standalone
+
+4. APERTURA APP
+   - L'app si apre con start_url del manifest
+   - Il service worker gestisce cache e offline
+   - L'app funziona come app nativa
+
+REQUISITI PER INSTALLAZIONE:
+----------------------------
+- HTTPS (obbligatorio)
+- Manifest.json valido
+- Service Worker registrato
+- Icone almeno 192x192 e 512x512
+- Visita dell'utente di almeno 30 secondi (Chrome)
+
+================================================================================
+6. BEST PRACTICES
+================================================================================
+
+1. VERSIONE CACHE
+   - Incrementare ad ogni aggiornamento significativo
+   - Formato: 'app-v[N]' (es. 'app-v1', 'app-v2')
+
+2. PRECACHE FILES
+   - Includere solo file essenziali
+   - Non precachare file troppo grandi
+   - Aggiornare quando si aggiungono nuove pagine
+
+3. STRATEGIA CACHE
+   - HTML: Sempre dalla rete (no cache)
+   - Asset statici: Cache normale
+   - API calls: Dipende dal caso d'uso
+
+4. AGGIORNAMENTI
+   - Testare sempre in locale prima
+   - Incrementare versione cache
+   - Verificare che i file siano aggiornati
+
+5. ICONE
+   - Logo.png: 512x512 (icona principale)
+   - Logomini.png: 192x192 (icona piccola)
+   - Formato PNG con trasparenza
+   - purpose: "any maskable" per adattabilità
+
+6. MANIFEST
+   - start_url: Usare "/" o "/home.html" (percorso relativo)
+   - scope: Di solito "/" per tutto il sito
+   - theme-color: Deve corrispondere al meta tag theme-color
+
+================================================================================
+7. TROUBLESHOOTING
+================================================================================
+
+PROBLEMA: App non si installa
+------------------------------
+CAUSE:
+- HTTPS non disponibile
+- Manifest.json non valido
+- Service Worker non registrato
+- Icone mancanti o dimensioni sbagliate
+
+SOLUZIONE:
+1. Verificare che il sito sia su HTTPS
+2. Validare manifest.json (https://manifest-validator.appspot.com/)
+3. Controllare console per errori service worker
+4. Verificare che le icone esistano e siano delle dimensioni corrette
+
+PROBLEMA: App non si aggiorna
+------------------------------
+CAUSE:
+- Versione cache non incrementata
+- Service Worker non rileva aggiornamenti
+
+SOLUZIONE:
+1. Incrementare CACHE_NAME nel service-worker.js
+2. Hard refresh (Ctrl+Shift+R)
+3. Unregister service worker da DevTools → Application → Service Workers
+
+PROBLEMA: Cache non funziona
+----------------------------
+CAUSE:
+- Service Worker non registrato correttamente
+- File non in PRECACHE_FILES
+
+SOLUZIONE:
+1. Verificare registrazione in console
+2. Aggiungere file mancanti a PRECACHE_FILES
+3. Verificare che i percorsi siano corretti
+
+PROBLEMA: App si apre ma mostra pagina sbagliata
+------------------------------------------------
+CAUSE:
+- start_url nel manifest non corretto
+
+SOLUZIONE:
+1. Verificare start_url nel manifest.json
+2. Assicurarsi che il percorso sia corretto
+3. Usare percorsi relativi ("/") invece di assoluti
+
+================================================================================
+                    CHECKLIST IMPLEMENTAZIONE PWA
+================================================================================
+
+□ Creare manifest.json con tutti i campi necessari
+□ Aggiungere <link rel="manifest"> in ogni pagina HTML
+□ Aggiungere <meta name="theme-color"> in ogni pagina HTML
+□ Creare service-worker.js con logica cache
+□ Registrare service worker in ogni pagina HTML
+□ Creare icone: logo.png (512x512) e logomini.png (192x192)
+□ Testare installazione su Chrome/Edge
+□ Testare installazione su Safari iOS
+□ Verificare funzionamento offline
+□ Testare aggiornamenti incrementando versione cache
+
+================================================================================
+                    ESEMPIO COMPLETO - FILE STRUCTURE
+================================================================================
+
+/
+├── index.html              # Shell desktop (opzionale)
+├── home.html               # Homepage principale
+├── manifest.json           # Manifest PWA
+├── service-worker.js       # Service Worker
+├── style.css               # CSS
+├── logo.png                # Icona 512x512
+├── logomini.png            # Icona 192x192
+├── logo.ico                # Favicon
+└── [altre-pagine].html     # Altre pagine del sito
+
+================================================================================
+                    NOTE FINALI
+================================================================================
+
+- Il Service Worker funziona solo su HTTPS (o localhost per sviluppo)
+- GitHub Pages fornisce HTTPS automaticamente
+- L'installazione PWA è supportata su:
+  * Chrome/Edge (Desktop e Mobile)
+  * Safari iOS (da iOS 11.3+)
+  * Firefox (Desktop)
+- Testare sempre su dispositivi reali
+- Monitorare console per errori
+- Mantenere versione cache aggiornata
+
+================================================================================
+                    FINE DOCUMENTAZIONE
+================================================================================
+

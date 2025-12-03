@@ -194,6 +194,40 @@ a:hover {
     font-style: italic;
 }
 
+.install-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: #0f2438;
+    border: 2px solid var(--color-primary-dark);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+    text-decoration: none;
+}
+
+.install-button:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
+}
+
+.install-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+}
+
+.install-button i {
+    font-size: 1.1rem;
+}
+
 .home-main {
     flex: 1;
     padding: 2rem 1.5rem;
@@ -589,6 +623,12 @@ a:hover {
     
     .home-title {
         font-size: 1.75rem;
+    }
+    
+    .install-button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        margin-top: 1rem;
     }
     
     .card {
