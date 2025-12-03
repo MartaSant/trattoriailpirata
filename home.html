@@ -151,7 +151,7 @@
         // Registrazione Service Worker
         if ('serviceWorker' in navigator) {
             // Registra immediatamente, non aspettare il load
-            navigator.serviceWorker.register('service-worker.js', { 
+            navigator.serviceWorker.register('/service-worker.js', { 
                 scope: '/',
                 updateViaCache: 'none' 
             })
