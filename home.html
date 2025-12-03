@@ -144,6 +144,19 @@
         // Aggiorna anno nel footer
         document.getElementById('year').textContent = new Date().getFullYear();
         
+        // Handler per installazione PWA (Chrome/Edge)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            // Previene il banner automatico
+            e.preventDefault();
+            // Salva l'evento per usarlo dopo
+            deferredPrompt = e;
+            console.log('PWA installabile - evento beforeinstallprompt catturato');
+            
+            // Opzionale: mostra un pulsante personalizzato per installare
+            // Puoi aggiungere qui un pulsante nell'UI se vuoi
+        });
+        
         // Registrazione Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
