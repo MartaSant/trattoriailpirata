@@ -2,22 +2,22 @@
   "name": "IL PIRATA · Naviga nel sapore",
   "short_name": "IL PIRATA",
   "description": "IL PIRATA - Naviga nel sapore. Ristorante a tema marinaro e piratesco con specialità di pesce e cocktail esotici.",
-  "start_url": "/",
+  "start_url": "https://martasant.github.io/trattoriailpirata/",
   "display": "standalone",
   "background_color": "#87CEEB",
   "theme_color": "#D4AF37",
   "orientation": "portrait",
-  "scope": "/",
+  "scope": "https://martasant.github.io/trattoriailpirata/",
   "lang": "it",
   "icons": [
     {
-      "src": "piratadef.png",
+      "src": "https://martasant.github.io/trattoriailpirata/piratadef.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "piratadef.png",
+      "src": "https://martasant.github.io/trattoriailpirata/piratadef.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
