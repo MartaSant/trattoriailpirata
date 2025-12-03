@@ -72,13 +72,6 @@
             <i class="fas fa-download"></i>
             <span>Installa App</span>
         </button>
-        <div id="install-info" class="install-info" style="display: none;">
-            <p><i class="fas fa-info-circle"></i> Cerca l'icona di installazione nella barra degli indirizzi del browser</p>
-        </div>
-        <div id="pwa-diagnostics" class="pwa-diagnostics" style="display: none;">
-            <h3>Diagnostica PWA</h3>
-            <ul id="pwa-checklist"></ul>
-        </div>
     </header>
     
     <main class="home-main">
@@ -136,18 +129,6 @@
                 <p class="card-subtitle">Indirizzo, mappa e contatti</p>
                 <div class="card-arrow">→</div>
             </a>
-            
-            <div class="card install-card" id="install-card">
-                <div class="card-icon">
-                    <i class="fas fa-download"></i>
-                </div>
-                <h2 class="card-title">Installa App</h2>
-                <p class="card-subtitle">Aggiungi IL PIRATA alla tua home screen</p>
-                <button class="install-card-button" id="install-card-button">
-                    <i class="fas fa-download"></i>
-                    <span>Installa Ora</span>
-                </button>
-            </div>
         </div>
     </main>
     
@@ -166,308 +147,6 @@
     <script>
         // Aggiorna anno nel footer
         document.getElementById('year').textContent = new Date().getFullYear();
-        
-        // Handler per installazione PWA (Chrome/Edge/Firefox Desktop)
-        let deferredPrompt;
-        const installButton = document.getElementById('install-button');
-        
-        // Debug: Verifica requisiti PWA
-        console.log('=== DEBUG PWA ===');
-        console.log('HTTPS:', window.location.protocol === 'https:');
-        console.log('Service Worker supportato:', 'serviceWorker' in navigator);
-        console.log('Standalone mode:', window.matchMedia('(display-mode: standalone)').matches);
-        console.log('iOS standalone:', window.navigator.standalone === true);
-        console.log('User Agent:', navigator.userAgent);
-        
-        // Verifica se il manifest è accessibile
-        fetch('manifest.json')
-            .then(response => {
-                if (response.ok) {
-                    console.log('✅ Manifest.json accessibile');
-                    return response.json();
-                } else {
-                    console.error('❌ Manifest.json non accessibile:', response.status);
-                }
-            })
-            .then(manifest => {
-                if (manifest) {
-                    console.log('✅ Manifest valido:', manifest);
-                    
-                    // Verifica requisiti minimi
-                    const hasName = manifest.name && manifest.short_name;
-                    const hasIcons = manifest.icons && manifest.icons.length >= 2;
-                    const hasStartUrl = manifest.start_url;
-                    const hasDisplay = manifest.display === 'standalone';
-                    
-                    console.log('Requisiti manifest:');
-                    console.log('  - name/short_name:', hasName ? '✅' : '❌');
-                    console.log('  - icons (min 2):', hasIcons ? '✅' : '❌');
-                    console.log('  - start_url:', hasStartUrl ? '✅' : '❌');
-                    console.log('  - display: standalone', hasDisplay ? '✅' : '❌');
-                    
-                    if (!hasName || !hasIcons || !hasStartUrl || !hasDisplay) {
-                        console.warn('⚠️ Alcuni requisiti PWA non sono soddisfatti!');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('❌ Errore nel caricamento del manifest:', error);
-            });
-        
-        // Verifica service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistration()
-                .then(registration => {
-                    if (registration) {
-                        console.log('✅ Service Worker registrato:', registration.scope);
-                        console.log('  - Stato:', registration.active ? 'attivo' : 'non attivo');
-                    } else {
-                        console.warn('⚠️ Service Worker non ancora registrato');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Errore nel controllo Service Worker:', error);
-                });
-        }
-        
-        // Mostra il pulsante quando l'app è installabile
-        window.addEventListener('beforeinstallprompt', function(e) {
-            // Previene il banner automatico
-            e.preventDefault();
-            // Salva l'evento per usarlo dopo
-            deferredPrompt = e;
-            console.log('✅ PWA installabile - evento beforeinstallprompt catturato');
-            
-            // Mostra il pulsante di installazione
-            if (installButton) {
-                installButton.style.display = 'inline-flex';
-                console.log('✅ Pulsante installazione mostrato');
-            }
-        });
-        
-        // Mostra diagnostica PWA
-        function showPWADiagnostics() {
-            const diagnostics = document.getElementById('pwa-diagnostics');
-            const checklist = document.getElementById('pwa-checklist');
-            if (!diagnostics || !checklist) return;
-            
-            const checks = [];
-            
-            // Check HTTPS
-            const isHTTPS = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
-            checks.push({
-                text: 'HTTPS o localhost',
-                status: isHTTPS,
-                required: true
-            });
-            
-            // Check Manifest
-            fetch('manifest.json')
-                .then(response => {
-                    const hasManifest = response.ok;
-                    checks.push({
-                        text: 'Manifest.json accessibile',
-                        status: hasManifest,
-                        required: true
-                    });
-                    
-                    if (hasManifest) {
-                        return response.json();
-                    }
-                })
-                .then(manifest => {
-                    if (manifest) {
-                        checks.push({
-                            text: 'Manifest valido (name, icons, start_url)',
-                            status: !!(manifest.name && manifest.icons && manifest.start_url),
-                            required: true
-                        });
-                    }
-                    
-                    // Check Service Worker
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.getRegistration()
-                            .then(registration => {
-                                checks.push({
-                                    text: 'Service Worker registrato',
-                                    status: !!registration,
-                                    required: true
-                                });
-                                
-                                // Render checklist
-                                renderChecklist(checks);
-                            });
-                    } else {
-                        checks.push({
-                            text: 'Service Worker supportato',
-                            status: false,
-                            required: true
-                        });
-                        renderChecklist(checks);
-                    }
-                })
-                .catch(() => {
-                    checks.push({
-                        text: 'Manifest.json accessibile',
-                        status: false,
-                        required: true
-                    });
-                    renderChecklist(checks);
-                });
-            
-            function renderChecklist(checks) {
-                checklist.innerHTML = checks.map(check => {
-                    const icon = check.status ? '✅' : '❌';
-                    const className = check.status ? 'check-ok' : 'check-fail';
-                    return `<li class="${className}">${icon} ${check.text}</li>`;
-                }).join('');
-                
-                const allPassed = checks.every(c => c.status);
-                if (!allPassed && window.innerWidth > 768) {
-                    diagnostics.style.display = 'block';
-                }
-            }
-        }
-        
-        // Se dopo 3 secondi non è ancora installabile, mostra info
-        const installInfo = document.getElementById('install-info');
-        setTimeout(function() {
-            if (!deferredPrompt && installButton) {
-                console.log('⚠️ PWA non installabile - possibili cause:');
-                console.log('  1. Browser non supporta PWA su questo OS');
-                console.log('  2. App già installata');
-                console.log('  3. Requisiti PWA non soddisfatti');
-                console.log('  4. Navigazione in locale (localhost)');
-                
-                // Mostra diagnostica
-                showPWADiagnostics();
-                
-                // Su desktop, mostra info alternativa
-                if (window.innerWidth > 768 && !window.matchMedia('(display-mode: standalone)').matches) {
-                    if (installInfo) {
-                        installInfo.style.display = 'block';
-                    }
-                    console.log('💡 Suggerimento: Cerca l\'icona di installazione nella barra degli indirizzi del browser');
-                }
-            }
-        }, 3000);
-        
-        // Nascondi il pulsante se l'app è già installata
-        window.addEventListener('appinstalled', function(e) {
-            console.log('✅ PWA installata con successo!');
-            deferredPrompt = null;
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-        });
-        
-        // Funzione per gestire l'installazione
-        async function handleInstall() {
-            if (!deferredPrompt) {
-                console.log('⚠️ Installazione non disponibile');
-                alert('L\'installazione non è disponibile in questo momento.\n\n' +
-                      'Possibili cause:\n' +
-                      '• Browser non supporta PWA su questo sistema operativo\n' +
-                      '• App già installata\n' +
-                      '• Requisiti PWA non ancora soddisfatti\n\n' +
-                      'Suggerimenti:\n' +
-                      '• Usa Chrome, Edge o Firefox su Windows\n' +
-                      '• Assicurati che il sito sia su HTTPS\n' +
-                      '• Cerca l\'icona di installazione nella barra degli indirizzi');
-                return;
-            }
-            
-            try {
-                // Mostra il prompt di installazione
-                deferredPrompt.prompt();
-                
-                // Attendi la risposta dell'utente
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log('Risposta installazione:', outcome);
-                
-                if (outcome === 'accepted') {
-                    console.log('✅ Utente ha accettato l\'installazione');
-                } else {
-                    console.log('❌ Utente ha rifiutato l\'installazione');
-                }
-                
-                // Pulisci l'evento
-                deferredPrompt = null;
-                
-                // Nascondi i pulsanti
-                if (installButton) {
-                    installButton.style.display = 'none';
-                }
-                const installCard = document.getElementById('install-card');
-                if (installCard) {
-                    installCard.style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Errore durante l\'installazione:', error);
-            }
-        }
-        
-        // Gestisci il click sul pulsante nell'header
-        if (installButton) {
-            installButton.addEventListener('click', handleInstall);
-        }
-        
-        // Gestisci il click sul pulsante nella card
-        const installCardButton = document.getElementById('install-card-button');
-        const installCard = document.getElementById('install-card');
-        
-        if (installCardButton) {
-            installCardButton.addEventListener('click', function(e) {
-                e.stopPropagation();
-                handleInstall();
-            });
-        }
-        
-        // Gestisci il click sulla card stessa
-        if (installCard) {
-            installCard.addEventListener('click', function(e) {
-                // Se il click è sul bottone, non fare nulla (già gestito)
-                if (e.target.closest('.install-card-button')) {
-                    return;
-                }
-                handleInstall();
-            });
-        }
-        
-        // Mostra/nascondi la card in base alla disponibilità
-        // Mostra la card di default (sarà nascosta se l'app è già installata)
-        if (installCard) {
-            // Nascondi solo se l'app è già installata
-            if (window.matchMedia('(display-mode: standalone)').matches || 
-                window.navigator.standalone === true) {
-                installCard.style.display = 'none';
-            } else {
-                // Mostra la card anche se beforeinstallprompt non è ancora arrivato
-                installCard.style.display = 'block';
-            }
-        }
-        
-        // Quando l'app diventa installabile, assicurati che la card sia visibile
-        window.addEventListener('beforeinstallprompt', function(e) {
-            if (installCard) {
-                installCard.style.display = 'block';
-            }
-        });
-        
-        window.addEventListener('appinstalled', function(e) {
-            if (installCard) {
-                installCard.style.display = 'none';
-            }
-        });
-        
-        // Verifica se l'app è già installata (standalone mode)
-        if (window.matchMedia('(display-mode: standalone)').matches || 
-            window.navigator.standalone === true) {
-            console.log('✅ App già installata');
-            if (installButton) {
-                installButton.style.display = 'none';
-            }
-        }
         
         // Registrazione Service Worker
         if ('serviceWorker' in navigator) {
@@ -512,6 +191,122 @@
                         }
                     });
                 }, 60000);
+            });
+        }
+        
+        // Funzione installazione PWA (supporto Chrome, Edge, Firefox)
+        let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        
+        // Rileva il browser
+        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isEdge = /Edg/.test(navigator.userAgent);
+        
+        // Verifica se l'app è già installata
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            // App già installata, nascondi il pulsante
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+        }
+        
+        // Mostra il pulsante quando l'app è installabile (Chrome/Edge)
+        window.addEventListener('beforeinstallprompt', function(e) {
+            // Previene il banner automatico
+            e.preventDefault();
+            // Salva l'evento per usarlo dopo
+            deferredPrompt = e;
+            
+            // Mostra il pulsante di installazione
+            if (installButton) {
+                installButton.style.display = 'inline-flex';
+            }
+        });
+        
+        // Per Firefox: mostra il pulsante se i requisiti PWA sono soddisfatti
+        if (isFirefox && installButton) {
+            // Verifica che il manifest sia accessibile
+            fetch('manifest.json')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(manifest => {
+                    if (manifest && manifest.name && manifest.icons && manifest.icons.length >= 1) {
+                        // Verifica che il service worker sia registrato
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.getRegistration()
+                                .then(registration => {
+                                    if (registration && window.location.protocol === 'https:') {
+                                        // Mostra il pulsante per Firefox
+                                        installButton.style.display = 'inline-flex';
+                                    }
+                                });
+                        }
+                    }
+                })
+                .catch(() => {
+                    // Errore nel caricamento del manifest
+                });
+        }
+        
+        // Nascondi il pulsante se l'app è già installata
+        window.addEventListener('appinstalled', function(e) {
+            console.log('✅ PWA installata con successo!');
+            deferredPrompt = null;
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+        });
+        
+        // Gestisci il click sul pulsante
+        if (installButton) {
+            installButton.addEventListener('click', async function() {
+                // Firefox: mostra istruzioni
+                if (isFirefox && !deferredPrompt) {
+                    alert('Per installare l\'app su Firefox:\n\n' +
+                          '1. Clicca sull\'icona "+" o "Install" nella barra degli indirizzi\n' +
+                          '2. Oppure vai al menu (☰) → "Installa" o "Installa come app"\n\n' +
+                          'L\'app verrà aggiunta al desktop e potrai aprirla come un\'applicazione.');
+                    return;
+                }
+                
+                if (!deferredPrompt) {
+                    // L'installazione non è disponibile
+                    alert('L\'installazione non è disponibile in questo momento.\n\n' +
+                          'Possibili cause:\n' +
+                          '• Browser non supporta PWA su questo sistema operativo\n' +
+                          '• App già installata\n' +
+                          '• Cerca l\'icona di installazione nella barra degli indirizzi');
+                    return;
+                }
+                
+                try {
+                    // Mostra il prompt di installazione (Chrome/Edge)
+                    deferredPrompt.prompt();
+                    
+                    // Attendi la risposta dell'utente
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        console.log('✅ Utente ha accettato l\'installazione');
+                    } else {
+                        console.log('❌ Utente ha rifiutato l\'installazione');
+                    }
+                    
+                    // Pulisci l'evento
+                    deferredPrompt = null;
+                    
+                    // Nascondi il pulsante
+                    if (installButton) {
+                        installButton.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Errore durante l\'installazione:', error);
+                }
             });
         }
         

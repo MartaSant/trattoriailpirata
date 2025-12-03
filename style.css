@@ -192,99 +192,36 @@ a:hover {
     color: #1a3a5f;
     font-weight: 400;
     font-style: italic;
+    margin-bottom: 1rem;
 }
 
 .install-button {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 1.5rem;
     padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    color: #0f2438;
-    border: 2px solid var(--color-primary-dark);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
-    font-size: 1rem;
+    color: #0f2438;
     font-weight: 600;
-    font-family: var(--font-main);
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
-    text-decoration: none;
+    margin-top: 1rem;
+    font-family: var(--font-main);
 }
 
 .install-button:hover {
-    background: var(--color-primary-light);
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
-}
-
-.install-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .install-button i {
-    font-size: 1.1rem;
-}
-
-.install-info {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid var(--color-primary);
-    border-radius: 8px;
-    color: #0f2438;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.install-info i {
-    margin-right: 0.5rem;
-    color: var(--color-primary);
-}
-
-.pwa-diagnostics {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid var(--color-primary);
-    border-radius: 8px;
-    color: #0f2438;
-    font-size: 0.9rem;
-    text-align: left;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.pwa-diagnostics h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
-    color: #0f2438;
-}
-
-.pwa-diagnostics ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.pwa-diagnostics li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.pwa-diagnostics li:last-child {
-    border-bottom: none;
-}
-
-.pwa-diagnostics .check-ok {
-    color: #28a745;
-}
-
-.pwa-diagnostics .check-fail {
-    color: #dc3545;
+    font-size: 1rem;
 }
 
 .home-main {
@@ -362,54 +299,6 @@ a:hover {
     font-size: 1.5rem;
     color: #0f2438;
     transition: transform 0.3s ease;
-}
-
-.install-card {
-    cursor: pointer;
-    border: 2px solid var(--color-primary);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
-    position: relative;
-}
-
-.install-card:hover {
-    border-color: var(--color-primary-light);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(212, 175, 55, 0.4);
-}
-
-.install-card-button {
-    margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    color: #0f2438;
-    border: 2px solid var(--color-primary-dark);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: var(--font-main);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    justify-content: center;
-}
-
-.install-card-button:hover {
-    background: var(--color-primary-light);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
-}
-
-.install-card-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
-}
-
-.install-card-button i {
-    font-size: 1.1rem;
 }
 
 .card:hover .card-arrow {
@@ -730,12 +619,6 @@ a:hover {
     
     .home-title {
         font-size: 1.75rem;
-    }
-    
-    .install-button {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-        margin-top: 1rem;
     }
     
     .card {
