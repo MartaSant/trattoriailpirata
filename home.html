@@ -68,6 +68,10 @@
         <img src="piratadef.png" alt="IL PIRATA" class="home-logo">
         <h1 class="home-title">IL PIRATA</h1>
         <p class="home-tagline">Naviga nel sapore</p>
+        <div id="sw-status" class="sw-status" style="display: none;">
+            <span class="sw-status-icon">⏳</span>
+            <span class="sw-status-text">Caricamento...</span>
+        </div>
         <button id="install-button" class="install-button" style="display: none;">
             <i class="fas fa-download"></i>
             <span>Installa App</span>
@@ -148,8 +152,22 @@
         // Aggiorna anno nel footer
         document.getElementById('year').textContent = new Date().getFullYear();
         
+        // Indicatore visivo Service Worker
+        const swStatus = document.getElementById('sw-status');
+        const swStatusIcon = swStatus.querySelector('.sw-status-icon');
+        const swStatusText = swStatus.querySelector('.sw-status-text');
+        
+        function updateSWStatus(status, message) {
+            swStatus.style.display = 'inline-flex';
+            swStatus.className = 'sw-status ' + status;
+            swStatusIcon.textContent = status === 'success' ? '✅' : status === 'error' ? '❌' : '⏳';
+            swStatusText.textContent = message;
+        }
+        
         // Registrazione Service Worker
         if ('serviceWorker' in navigator) {
+            updateSWStatus('', 'Registrazione Service Worker...');
+            
             // Registra immediatamente, non aspettare il load
             navigator.serviceWorker.register('/service-worker.js', { 
                 scope: '/',
@@ -160,10 +178,21 @@
                 
                 // Verifica che sia attivo
                 if (registration.active) {
+                    updateSWStatus('success', 'Service Worker attivo');
                     console.log('✅ Service Worker attivo');
                 } else if (registration.installing) {
+                    updateSWStatus('', 'Service Worker in installazione...');
                     console.log('⏳ Service Worker in installazione...');
+                    
+                    // Aspetta che si attivi
+                    registration.installing.addEventListener('statechange', function() {
+                        if (registration.installing.state === 'activated') {
+                            updateSWStatus('success', 'Service Worker attivo');
+                            console.log('✅ Service Worker attivato');
+                        }
+                    });
                 } else if (registration.waiting) {
+                    updateSWStatus('', 'Service Worker in attesa...');
                     console.log('⏳ Service Worker in attesa...');
                 }
                 
@@ -184,6 +213,7 @@
                     if (newWorker) {
                         newWorker.addEventListener('statechange', function() {
                             if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                                updateSWStatus('success', 'Service Worker attivo');
                                 console.log('Nuovo Service Worker attivato, ricarico la pagina...');
                                 window.location.reload();
                             }
@@ -192,6 +222,7 @@
                 });
             })
             .catch(function(error) {
+                updateSWStatus('error', 'Errore: ' + (error.message || 'Registrazione fallita'));
                 console.error('❌ Registrazione Service Worker fallita:', error);
                 console.error('Dettagli errore:', error.message, error.stack);
             });
@@ -205,6 +236,7 @@
                 });
             }, 60000);
         } else {
+            updateSWStatus('error', 'Service Worker non supportato');
             console.warn('⚠️ Service Worker non supportato dal browser');
         }
         
